@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding:20px; background:#fafafa; }
+    h2 { color:#ff7b54; }
+    input { margin:5px; padding:8px; border:1px solid #ccc; border-radius:5px; }
+    button { padding:8px 12px; background:#ff7b54; color:white; border:none; border-radius:5px; cursor:pointer; }
+    button:hover { background:#e85c41; }
+    ul { list-style:none; padding:0; }
+    li { margin:8px 0; background:#fff; padding:10px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
+    .section { margin-bottom:40px; }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+
+  <!-- Items Section -->
+  <div class="section">
+    <h2>Manage Items</h2>
+    <div>
+      <input id="name" placeholder="Name">
+      <input id="desc" placeholder="Description">
+      <input id="price" type="number" placeholder="Price">
+      <input id="img" placeholder="Image URL">
+      <input id="msg" placeholder="WhatsApp Msg">
+      <button id="addItemBtn">Add Item</button>
+    </div>
+    <h3>Item List</h3>
+    <ul id="itemList"></ul>
+  </div>
+
+  <!-- Offers Section -->
+  <div class="section">
+    <h2>Manage Offers</h2>
+    <div>
+      <input id="offerTitle" placeholder="Offer Title">
+      <input id="offerDesc" placeholder="Description">
+      <input id="offerPrice" type="number" placeholder="Price">
+      <input id="offerImg" placeholder="Image URL">
+      <input id="offerMsg" placeholder="WhatsApp Msg">
+      <button id="addOfferBtn">Add Offer</button>
+    </div>
+    <h3>Offer List</h3>
+    <ul id="offerList"></ul>
+  </div>
+
+  <script type="module">
+    import { db, collection, addDoc, getDocs, deleteDoc, doc } from "./firebase.js";
+
+    // ------------------- ITEMS -------------------
+    const itemList = document.getElementById("itemList");
+    const addItemBtn = document.getElementById("addItemBtn");
+
+    async function loadItems() {
+      const querySnapshot = await getDocs(collection(db, "items"));
+      itemList.innerHTML = "";
+      querySnapshot.forEach((d) => {
+        let item = d.data();
+        itemList.innerHTML += `
+          <li>
+            <span><b>${item.name}</b> - ₹${item.price}</span>
+            <button onclick="deleteItem('${d.id}')">Delete</button>
+          </li>
+        `;
+      });
+    }
+
+    window.deleteItem = async (id) => {
+      await deleteDoc(doc(db, "items", id));
+      loadItems();
+    };
+
+    addItemBtn.addEventListener("click", async () => {
+      const name = document.getElementById("name").value;
+      const desc = document.getElementById("desc").value;
+      const price = document.getElementById("price").value;
+      const img = document.getElementById("img").value;
+      const msg = document.getElementById("msg").value;
+
+      await addDoc(collection(db, "items"), {
+        name, description: desc, price: Number(price), img, whatsappMsg: msg
+      });
+
+      loadItems();
+    });
+
+    // ------------------- OFFERS -------------------
+    const offerList = document.getElementById("offerList");
+    const addOfferBtn = document.getElementById("addOfferBtn");
+
+    async function loadOffers() {
+      const querySnapshot = await getDocs(collection(db, "offers"));
+      offerList.innerHTML = "";
+      querySnapshot.forEach((d) => {
+        let offer = d.data();
+        offerList.innerHTML += `
+          <li>
+            <span><b>${offer.title}</b> - ₹${offer.price}</span>
+            <button onclick="deleteOffer('${d.id}')">Delete</button>
+          </li>
+        `;
+      });
+    }
+
+    window.deleteOffer = async (id) => {
+      await deleteDoc(doc(db, "offers", id));
+      loadOffers();
+    };
+
+    addOfferBtn.addEventListener("click", async () => {
+      const title = document.getElementById("offerTitle").value;
+      const desc = document.getElementById("offerDesc").value;
+      const price = document.getElementById("offerPrice").value;
+      const img = document.getElementById("offerImg").value;
+      const msg = document.getElementById("offerMsg").value;
+
+      await addDoc(collection(db, "offers"), {
+        title, description: desc, price: Number(price), img, whatsappMsg: msg
+      });
+
+      loadOffers();
+    });
+
+    // Load all data on start
+    loadItems();
+    loadOffers();
+  </script>
+</body>
+</html>

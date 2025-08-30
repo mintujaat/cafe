@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Café Delight Menu</title>
+  <style>
+    body { margin:0; font-family:'Poppins', sans-serif; background:#fff8f0; color:#333; }
+marquee{ background-color: rgb(255, 160, 101);color: greenyellow;}
+    /* Navbar */
+    nav { background:#ff7b54; color:white; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+    nav .logo { font-size:1.5rem; font-weight:700; }
+    nav ul { list-style:none; display:flex; margin:0; padding:0; }
+    nav ul li { margin:0 10px; }
+    nav ul li a { color:white; text-decoration:none; font-weight:600; }
+    nav ul li a:hover { text-decoration:underline; }
+    .menu-toggle { display:none; font-size:1.5rem; cursor:pointer; }
+
+    @media(max-width:768px){
+      nav ul { display:none; flex-direction:column; background:#ff7b54; position:absolute; top:60px; left:0; width:100%; }
+      nav ul.show { display:flex; }
+      .menu-toggle { display:block; }
+    }
+
+    header { background:linear-gradient(135deg,#ff7b54,#ffb26b); padding:40px 20px; text-align:center; color:white; font-size:2rem; font-weight:700; letter-spacing:2px; box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+    .menu { display:grid; grid-template-columns:1fr; gap:10px; padding:10px; }
+    .item { background:white; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:transform 0.3s; }
+    .item:hover { transform:scale(1.03);}
+    .item img { width:100%; height:200px; object-fit:cover; }
+    .info { padding:15px; }
+    .info h3 { margin:0; font-size:1.3rem; color:#ff7b54; }
+    .info p { font-size:0.95rem; margin:8px 0; color:#555; }
+    .price { font-weight:600; color:#27ae60; }
+    .order-btn { display:inline-block; margin-top:10px; background:#ff7b54; color:white; padding:10px 15px; border-radius:25px; text-decoration:none; font-weight:600; transition:background 0.3s; }
+    .order-btn:hover { background:#e85c41; }
+    @media(min-width:768px){ .menu{ grid-template-columns:repeat(2,1fr);} }
+    @media(min-width:1024px){ .menu{ grid-template-columns:repeat(3,1fr);} }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">☕ Apni Bethak</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul id="navLinks">
+      <li><a href="index.html">Menu</a></li>
+      <li><a href="offer.html">Offers</a></li>
+      
+    </ul>
+  </nav>
+<marquee id="m">Apni bethak per vist krne k liye danawad apka din subh ho </marquee>
+ 
+  <header>Apni bethak Menu</header>
+  <section id="menu" class="menu"></section>
+
+  <script type="module">
+    import { db, collection, getDocs } from "./firebase.js";
+
+    async function loadMenu() {
+      const menuContainer = document.getElementById("menu");
+      const querySnapshot = await getDocs(collection(db, "items"));
+      menuContainer.innerHTML = "";
+
+      querySnapshot.forEach((doc) => {
+        let item = doc.data();
+        menuContainer.innerHTML += `
+          <div class="item">
+            <img src="${item.img}" alt="${item.name}">
+            <div class="info">
+              <h3>${item.name}</h3>
+              <p>${item.description}</p>
+              <span class="price">₹${item.price}</span><br>
+              <a class="order-btn" href="https://wa.me/919350244143?text=${encodeURIComponent(item.whatsappMsg)}">Order Now</a>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    loadMenu();
+
+    // Navbar toggle (mobile)
+    window.toggleMenu = () => {
+      document.getElementById("navLinks").classList.toggle("show");
+    };
+  </script>
+  <!-- बाकी menu.html same रहेगा, बस ये CSS + HTML add करना है -->
+
+<style>
+  /* Floating Offer Button */
+  .floating-offer-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #ff7b54;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.3s, background 0.3s;
+    z-index: 999;
+  }
+  .floating-offer-btn:hover {
+    background: #e85c41;
+    transform: scale(1.1);
+  }
+</style>
+
+<!-- Floating Offers Button -->
+<a href="offer.html" class="floating-offer-btn">🔥 Offers</a>
+<style>
+  /* Floating Call Button */
+  .floating-call-btn {
+    position: fixed;
+    bottom: 90px; /* offers button ke upar space */
+    right: 20px;
+    background: #27ae60;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.3s, background 0.3s;
+    z-index: 999;
+  }
+  .floating-call-btn:hover {
+    background: #219150;
+    transform: scale(1.1);
+  }
+</style>
+
+<!-- Floating Call Button -->
+<a href="tel:9671242965" class="floating-call-btn">📞 Call Us</a>
+
+
+</body>
+</html>
